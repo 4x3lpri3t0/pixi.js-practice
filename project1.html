@@ -9,17 +9,25 @@
         }
     </style>
     <script src="pixi.js/bin/pixi.js"></script>
+    <script src="characterMovement.js"></script>
 </head>
 <body>
     <script>
     SCREEN_WIDTH = 400;
     SCREEN_HEIGHT = 300;
     BUNNY_JUMPING_MAX = 30;
-    AIR_VELOCITY = 3;
+    JUMP_VELOCITY = 3;
+    LATERAL_VELOCITY = 2;
+    GRAVITY = 5;
 
     isBunnyJumping = false;
     isBunnyFalling = true;
     jumpedDistance = 0;
+    velocityX = 0;
+    velocityY = 0;
+    key_left = false;
+    key_right = false;
+    key_up = false;
 
     // create an new instance of a pixi stage
     var stage = new PIXI.Stage(0x66FF99); 
@@ -52,66 +60,41 @@
         renderer.render(stage);
     }
     
-    function characterMovement(){
-        document.body.onkeydown = function(event){
-            event = event || window.event;
-            var keycode = event.charCode || event.keyCode;
-            
-            if (keycode == 37) bunny.position.x -= 2; // LEFT            
-            else if (keycode == 39) bunny.position.x += 2; // RIGHT
-            
-            if (keycode == 38) { // JUMP
-                if ((bunny.position.y + bunny.height/2) === SCREEN_HEIGHT) { // floor
-                
-                    isBunnyJumping = true;
-                    isBunnyFalling = false;
-                }
-            };
-        }
+    document.body.onkeydown = function(event){
+        event = event || window.event;
+        var keycode = event.charCode || event.keyCode;
+        
+        if (keycode == 37) key_left = true; // LEFT
+        if (keycode == 39) key_right = true; // RIGHT
+        if (keycode == 38) key_up = true; // JUMP
+    }
 
-        bunnyJumpLogic();
-
-        function bunnyJumpLogic(){
-            if(isBunnyJumping) {
-                if (jumpedDistance >= BUNNY_JUMPING_MAX) {
-                    isBunnyJumping = false;
-                    isBunnyFalling = true;
-                    jumpedDistance = 0;
-                }
-                else {
-                    bunny.position.y -= AIR_VELOCITY;
-                    jumpedDistance++;
-                }
-            }
-            else if(isBunnyFalling) {
-                if ((bunny.position.y + bunny.height/2) < SCREEN_HEIGHT) {
-                    bunny.position.y += AIR_VELOCITY;
-                };
-            }
-        }
+    document.body.onkeyup = function(event){
+        event = event || window.event;
+        var keycode = event.charCode || event.keyCode;
+        
+        if (keycode == 37) key_left = false; // LEFT
+        if (keycode == 39) key_right = false; // RIGHT
+        if (keycode == 38) key_up = false; // JUMP
     }
 
     function calculateCollision(){
         var xdist = carrot.position.x - bunny.position.x;
 
-        if(xdist > -carrot.width/2 && xdist < carrot.width/2)
-        {
+        if(xdist > -carrot.width/2 && xdist < carrot.width/2) {
             var ydist = carrot.position.y - bunny.position.y;
         
-            if(ydist > -carrot.height/2 && ydist < carrot.height/2)
-            {
+            if(ydist > -carrot.height/2 && ydist < carrot.height/2) {
                 // HIT CODE!!
             }
         }
     }
 
     function textureUpdater(){
-        if(bunny.texture.baseTexture.hasLoaded) //TODO: Modularize
-        {
+        if(bunny.texture.baseTexture.hasLoaded) {
             texturePositionSetter();
         }
-        else
-        {
+        else {
             carrotTexture.addEventListener("update", texturePositionSetter);
         }
     }
@@ -123,8 +106,6 @@
         carrot.position.x = SCREEN_WIDTH / 2;
         carrot.position.y = SCREEN_HEIGHT / 2;
     }
-
-    
 
     </script>
 </body>
