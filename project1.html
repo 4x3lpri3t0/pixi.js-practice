@@ -28,6 +28,7 @@
     key_left = false;
     key_right = false;
     key_up = false;
+    playerScore = 0;
 
     // create an new instance of a pixi stage
     var stage = new PIXI.Stage(0x66FF99); 
@@ -41,11 +42,16 @@
     // create a new Sprite using the texture
     var carrot = new PIXI.Sprite(carrotTexture);
     var bunny = new PIXI.Sprite(bunnyTexture);
+
+    var playerScoreText = new PIXI.Text("Player score: " + playerScore, {font: "35px Desyrel"});
+    playerScoreText.position.x = 5;
+    playerScoreText.position.y = 5;
  
     // center the sprites anchor point
     carrot.anchor.x = bunny.anchor.x = 0.5;
     carrot.anchor.y = bunny.anchor.y = 0.5; 
  
+    stage.addChild(playerScoreText)
     stage.addChild(carrot);
     stage.addChild(bunny);
 
@@ -55,6 +61,7 @@
     function animate() {
         requestAnimFrame(animate);
         carrot.rotation += 0.1;
+        playerScoreText.setText("Player score: " + playerScore)
         characterMovement();
         calculateCollision();
         renderer.render(stage);
@@ -85,7 +92,10 @@
             var ydist = carrot.position.y - bunny.position.y;
         
             if(ydist > -carrot.height/2 && ydist < carrot.height/2) {
-                // HIT CODE!!
+                // HIT CODE
+                carrot.position.x = getRandomArbitrary(0, SCREEN_WIDTH);
+                carrot.position.y = getRandomArbitrary(SCREEN_HEIGHT / 2 + 50, SCREEN_HEIGHT / 2 + 130);
+                playerScore += 50;
             }
         }
     }
@@ -104,9 +114,13 @@
         bunny.position.y = SCREEN_HEIGHT - bunny.height/2;
 
         carrot.position.x = SCREEN_WIDTH / 2;
-        carrot.position.y = SCREEN_HEIGHT / 2;
+        carrot.position.y = SCREEN_HEIGHT / 2 + 50;
     }
 
+    // Returns a random number between min and max
+    function getRandomArbitrary(min, max) {
+      return Math.random() * (max - min) + min;
+    }
     </script>
 </body>
 </html>
