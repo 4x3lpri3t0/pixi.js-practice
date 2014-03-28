@@ -12,78 +12,125 @@
 </head>
 <body>
     <script>
- 
+    SCREEN_WIDTH = 400;
+    SCREEN_HEIGHT = 300;
+    BUNNY_JUMPING_MAX = 30;
+    AIR_VELOCITY = 3;
+
+    isBunnyJumping = false;
+    isBunnyFalling = true;
+    jumpedDistance = 0;  
+
     // create an new instance of a pixi stage
     var stage = new PIXI.Stage(0x66FF99);
  
     // create a renderer instance.
-    var renderer = PIXI.autoDetectRenderer(400, 300);
+    var renderer = PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
  
     // add the renderer view element to the DOM
     document.body.appendChild(renderer.view);
- 
-    requestAnimFrame(animate);
 
     // create a texture from an image path
-    var texture = PIXI.Texture.fromImage("pixi.js/test/textures/bunny.png");
+    var bunnyTexture = PIXI.Texture.fromImage("pixi.js/test/textures/bunny.png");
+    var carrotTexture = PIXI.Texture.fromImage("carrot.png");
     // create a new Sprite using the texture
-    var bunny = new PIXI.Sprite(texture);
-    var bunny2 = new PIXI.Sprite(texture);
+    var carrot = new PIXI.Sprite(carrotTexture);
+    var bunny = new PIXI.Sprite(bunnyTexture);
  
     // center the sprites anchor point
-    bunny.anchor.x = bunny2.anchor.x = 0.5;
-    bunny.anchor.y = bunny2.anchor.y = 0.5;
+    carrot.anchor.x = bunny.anchor.x = 0.5;
+    carrot.anchor.y = bunny.anchor.y = 0.5; 
  
-    // move the sprite t the center of the screen
-    bunny.position.x = 200;
-    bunny.position.y = 150;
-
-    bunny2.position.x = 100;
-    bunny2.position.y = 50;
- 
+    stage.addChild(carrot);
     stage.addChild(bunny);
-    stage.addChild(bunny2);
+
+    textureUpdater();
+    requestAnimFrame(animate);
  
     function animate() {
- 
+        
+        bunnyJumpLogic();
         requestAnimFrame(animate);
         
         // just for fun, lets rotate mr rabbit a little
-        bunny.rotation += 0.1;
+        carrot.rotation += 0.1;
 
         document.body.onkeydown = function(event){
             event = event || window.event;
             var keycode = event.charCode || event.keyCode;
             
-            if(keycode == 37) bunny2.position.x -= 2;
-            if(keycode == 38) bunny2.position.y -= 2;
-            if(keycode == 39) bunny2.position.x += 2;
-            if(keycode == 40) bunny2.position.y += 2; 
+            if(keycode == 37) bunny.position.x -= 2; // LEFT            
+            if(keycode == 39) bunny.position.x += 2; // RIGHT
+            if ((bunny.position.y + bunny.height/2) === SCREEN_HEIGHT) {
+                if(keycode == 38) { // JUMP
+                    isBunnyJumping = true;
+                    isBunnyFalling = false;
+                }
+            };
         }
 
         calculateCollision();
-
-        // render the stage   
+  
         renderer.render(stage);
     }
     
     function calculateCollision(){
-        var xdist = bunny.position.x - bunny2.position.x;
+        var xdist = carrot.position.x - bunny.position.x;
 
-        if(xdist > -bunny.width/2 && xdist < bunny.width/2)
+        if(xdist > -carrot.width/2 && xdist < carrot.width/2)
         {
-            var ydist = bunny.position.y - bunny2.position.y;
+            var ydist = carrot.position.y - bunny.position.y;
         
-            if(ydist > -bunny.height/2 && ydist < bunny.height/2)
+            if(ydist > -carrot.height/2 && ydist < carrot.height/2)
             {
                 // HIT CODE!!
-                bunny2.position.x = 100;
-                bunny2.position.y = 50;
             }
         }
     }
 
+    function textureUpdater(){
+        if(bunny.texture.baseTexture.hasLoaded) //TODO: Modularize
+        {
+            texturePositions();
+        }
+        else
+        {
+            carrotTexture.addEventListener("update", onTextureUpdate);
+        }
+
+        function onTextureUpdate()
+        {
+            texturePositions();
+        }
+    }
+
+    function texturePositions(){
+        bunny.position.x = 100;
+        bunny.position.y = SCREEN_HEIGHT - bunny.height/2;
+
+        carrot.position.x = SCREEN_WIDTH / 2;
+        carrot.position.y = SCREEN_HEIGHT / 2;
+    }
+
+    function bunnyJumpLogic(){
+        if(isBunnyJumping) {
+            if (jumpedDistance >= BUNNY_JUMPING_MAX) {
+                isBunnyJumping = false;
+                isBunnyFalling = true;
+                jumpedDistance = 0;
+            }
+            else {
+                bunny.position.y -= AIR_VELOCITY;
+                jumpedDistance++;
+            }
+        }
+        else if(isBunnyFalling) {
+            if ((bunny.position.y + bunny.height/2) < SCREEN_HEIGHT) {
+                bunny.position.y += AIR_VELOCITY;
+            };
+        }
+    }
+
     </script>
- 
-    </body>
+</body>
 </html>
