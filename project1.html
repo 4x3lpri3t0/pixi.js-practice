@@ -1,0 +1,89 @@
+<html>
+<head>
+    <title>pixi.js example 1</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <script src="pixi.js/bin/pixi.js"></script>
+</head>
+<body>
+    <script>
+ 
+    // create an new instance of a pixi stage
+    var stage = new PIXI.Stage(0x66FF99);
+ 
+    // create a renderer instance.
+    var renderer = PIXI.autoDetectRenderer(400, 300);
+ 
+    // add the renderer view element to the DOM
+    document.body.appendChild(renderer.view);
+ 
+    requestAnimFrame(animate);
+
+    // create a texture from an image path
+    var texture = PIXI.Texture.fromImage("pixi.js/test/textures/bunny.png");
+    // create a new Sprite using the texture
+    var bunny = new PIXI.Sprite(texture);
+    var bunny2 = new PIXI.Sprite(texture);
+ 
+    // center the sprites anchor point
+    bunny.anchor.x = bunny2.anchor.x = 0.5;
+    bunny.anchor.y = bunny2.anchor.y = 0.5;
+ 
+    // move the sprite t the center of the screen
+    bunny.position.x = 200;
+    bunny.position.y = 150;
+
+    bunny2.position.x = 100;
+    bunny2.position.y = 50;
+ 
+    stage.addChild(bunny);
+    stage.addChild(bunny2);
+ 
+    function animate() {
+ 
+        requestAnimFrame(animate);
+        
+        // just for fun, lets rotate mr rabbit a little
+        bunny.rotation += 0.1;
+
+        document.body.onkeydown = function(event){
+            event = event || window.event;
+            var keycode = event.charCode || event.keyCode;
+            
+            if(keycode == 37) bunny2.position.x -= 2;
+            if(keycode == 38) bunny2.position.y -= 2;
+            if(keycode == 39) bunny2.position.x += 2;
+            if(keycode == 40) bunny2.position.y += 2; 
+        }
+
+        calculateCollision();
+
+        // render the stage   
+        renderer.render(stage);
+    }
+    
+    function calculateCollision(){
+        var xdist = bunny.position.x - bunny2.position.x;
+
+        if(xdist > -bunny.width/2 && xdist < bunny.width/2)
+        {
+            var ydist = bunny.position.y - bunny2.position.y;
+        
+            if(ydist > -bunny.height/2 && ydist < bunny.height/2)
+            {
+                // HIT CODE!!
+                bunny2.position.x = 100;
+                bunny2.position.y = 50;
+            }
+        }
+    }
+
+    </script>
+ 
+    </body>
+</html>
