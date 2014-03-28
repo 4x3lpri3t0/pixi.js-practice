@@ -19,17 +19,14 @@
 
     isBunnyJumping = false;
     isBunnyFalling = true;
-    jumpedDistance = 0;  
+    jumpedDistance = 0;
 
     // create an new instance of a pixi stage
-    var stage = new PIXI.Stage(0x66FF99);
- 
+    var stage = new PIXI.Stage(0x66FF99); 
     // create a renderer instance.
     var renderer = PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
- 
     // add the renderer view element to the DOM
     document.body.appendChild(renderer.view);
-
     // create a texture from an image path
     var bunnyTexture = PIXI.Texture.fromImage("pixi.js/test/textures/bunny.png");
     var carrotTexture = PIXI.Texture.fromImage("carrot.png");
@@ -48,32 +45,52 @@
     requestAnimFrame(animate);
  
     function animate() {
-        
-        bunnyJumpLogic();
         requestAnimFrame(animate);
-        
-        // just for fun, lets rotate mr rabbit a little
         carrot.rotation += 0.1;
-
+        characterMovement();
+        calculateCollision();
+        renderer.render(stage);
+    }
+    
+    function characterMovement(){
         document.body.onkeydown = function(event){
             event = event || window.event;
             var keycode = event.charCode || event.keyCode;
             
-            if(keycode == 37) bunny.position.x -= 2; // LEFT            
-            if(keycode == 39) bunny.position.x += 2; // RIGHT
-            if ((bunny.position.y + bunny.height/2) === SCREEN_HEIGHT) {
-                if(keycode == 38) { // JUMP
+            if (keycode == 37) bunny.position.x -= 2; // LEFT            
+            else if (keycode == 39) bunny.position.x += 2; // RIGHT
+            
+            if (keycode == 38) { // JUMP
+                if ((bunny.position.y + bunny.height/2) === SCREEN_HEIGHT) { // floor
+                
                     isBunnyJumping = true;
                     isBunnyFalling = false;
                 }
             };
         }
 
-        calculateCollision();
-  
-        renderer.render(stage);
+        bunnyJumpLogic();
+
+        function bunnyJumpLogic(){
+            if(isBunnyJumping) {
+                if (jumpedDistance >= BUNNY_JUMPING_MAX) {
+                    isBunnyJumping = false;
+                    isBunnyFalling = true;
+                    jumpedDistance = 0;
+                }
+                else {
+                    bunny.position.y -= AIR_VELOCITY;
+                    jumpedDistance++;
+                }
+            }
+            else if(isBunnyFalling) {
+                if ((bunny.position.y + bunny.height/2) < SCREEN_HEIGHT) {
+                    bunny.position.y += AIR_VELOCITY;
+                };
+            }
+        }
     }
-    
+
     function calculateCollision(){
         var xdist = carrot.position.x - bunny.position.x;
 
@@ -91,20 +108,15 @@
     function textureUpdater(){
         if(bunny.texture.baseTexture.hasLoaded) //TODO: Modularize
         {
-            texturePositions();
+            texturePositionSetter();
         }
         else
         {
-            carrotTexture.addEventListener("update", onTextureUpdate);
-        }
-
-        function onTextureUpdate()
-        {
-            texturePositions();
+            carrotTexture.addEventListener("update", texturePositionSetter);
         }
     }
 
-    function texturePositions(){
+    function texturePositionSetter(){
         bunny.position.x = 100;
         bunny.position.y = SCREEN_HEIGHT - bunny.height/2;
 
@@ -112,24 +124,7 @@
         carrot.position.y = SCREEN_HEIGHT / 2;
     }
 
-    function bunnyJumpLogic(){
-        if(isBunnyJumping) {
-            if (jumpedDistance >= BUNNY_JUMPING_MAX) {
-                isBunnyJumping = false;
-                isBunnyFalling = true;
-                jumpedDistance = 0;
-            }
-            else {
-                bunny.position.y -= AIR_VELOCITY;
-                jumpedDistance++;
-            }
-        }
-        else if(isBunnyFalling) {
-            if ((bunny.position.y + bunny.height/2) < SCREEN_HEIGHT) {
-                bunny.position.y += AIR_VELOCITY;
-            };
-        }
-    }
+    
 
     </script>
 </body>
