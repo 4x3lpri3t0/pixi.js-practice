@@ -1,0 +1,150 @@
+<html>
+<head>
+    <title>pixi.js example 1</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <script src="../pixi.js/bin/pixi.js"></script>
+    <script src="characterMovement.js"></script>
+    <script src="jaguarMovement.js"></script>
+</head>
+<body>
+    <script>
+    SCREEN_WIDTH = 400;
+    SCREEN_HEIGHT = 300;
+    BUNNY_JUMPING_MAX = 30;
+    JUMP_VELOCITY = 3;
+    LATERAL_VELOCITY = 2;
+    GRAVITY = 5;
+
+    isBunnyJumping = false;
+    isBunnyFalling = true;
+    jumpedDistance = 0;
+    velocityX = 0;
+    velocityY = 0;
+    key_left = false;
+    key_right = false;
+    key_up = false;
+    playerScore = 0;
+    jaguarGoesToLeft = true;
+
+    // create an new instance of a pixi stage
+    var stage = new PIXI.Stage(0x66FF99); 
+    // create a renderer instance.
+    var renderer = PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    // add the renderer view element to the DOM
+    document.body.appendChild(renderer.view);
+    // create a texture from an image path
+	var backgroundTexture = PIXI.Texture.fromImage("background-sky.png");
+    var bunnyTexture = PIXI.Texture.fromImage("bunny.png");
+    var carrotTexture = PIXI.Texture.fromImage("carrot.png");
+    var jaguarTexture = PIXI.Texture.fromImage("jaguar.png");
+    // create a new Sprite using the texture
+	var background = new PIXI.Sprite(backgroundTexture);
+    var carrot = new PIXI.Sprite(carrotTexture);
+    var bunny = new PIXI.Sprite(bunnyTexture);
+    var jaguar = new PIXI.Sprite(jaguarTexture);
+
+    var playerScoreText = new PIXI.Text("Player score: " + playerScore, {font: "35px Desyrel"});
+    playerScoreText.position.x = 5;
+    playerScoreText.position.y = 5;
+ 
+    // center the sprites anchor point
+    carrot.anchor.x = bunny.anchor.x = jaguar.anchor.x = 0.5;
+    carrot.anchor.y = bunny.anchor.y = jaguar.anchor.y = 0.5;
+	
+	stage.addChild(background);
+    stage.addChild(playerScoreText);
+    stage.addChild(carrot);
+    stage.addChild(jaguar);
+    stage.addChild(bunny);
+
+    textureUpdater();
+    requestAnimFrame(animate);
+ 
+    function animate() {
+        requestAnimFrame(animate);
+        carrot.rotation += 0.1;
+        playerScoreText.setText("Player score: " + playerScore)
+        characterMovement();
+        jaguarMovement();
+        calculateCollisions();
+        renderer.render(stage);
+    }
+    
+    document.body.onkeydown = function(event){
+        event = event || window.event;
+        var keycode = event.charCode || event.keyCode;
+        
+        if (keycode == 37) key_left = true; // LEFT
+        if (keycode == 39) key_right = true; // RIGHT
+        if (keycode == 38) key_up = true; // JUMP
+    }
+
+    document.body.onkeyup = function(event){
+        event = event || window.event;
+        var keycode = event.charCode || event.keyCode;
+        
+        if (keycode == 37) key_left = false; // LEFT
+        if (keycode == 39) key_right = false; // RIGHT
+        if (keycode == 38) key_up = false; // JUMP
+    }
+
+    function calculateCollisions(){
+        var xdist = carrot.position.x - bunny.position.x;
+
+        if(xdist > -carrot.width/2 && xdist < carrot.width/2) {
+            var ydist = carrot.position.y - bunny.position.y;
+        
+            if(ydist > -carrot.height/2 && ydist < carrot.height/2) {
+                carrot.position.x = getRandomArbitrary(0, SCREEN_WIDTH);
+                carrot.position.y = getRandomArbitrary(SCREEN_HEIGHT / 2 + 50, SCREEN_HEIGHT / 2 + 130);
+                playerScore += 50;
+            }
+        }
+
+        xdist = jaguar.position.x - bunny.position.x;
+
+        if (xdist > -jaguar.width/2 && xdist < jaguar.width/2) {
+            ydist = jaguar.position.y - bunny.position.y;
+        
+            if(ydist > -jaguar.height/2 && ydist < jaguar.height/2) {
+                playerScore = 0;
+            }
+        };
+    }
+
+    function textureUpdater(){
+        if(bunny.texture.baseTexture.hasLoaded) {
+            texturePositionSetter();
+        }
+        else {
+            carrotTexture.addEventListener("update", texturePositionSetter);
+        }
+    }
+
+    function texturePositionSetter(){
+        bunny.position.x = 100;
+        bunny.position.y = SCREEN_HEIGHT - bunny.height/2;
+        jaguar.position.x = 500;
+        jaguar.position.y = SCREEN_HEIGHT - jaguar.height/2 - 20; // 20 because of image offset
+        carrot.position.x = SCREEN_WIDTH / 2;
+        carrot.position.y = SCREEN_HEIGHT / 2 + 50;
+    }
+
+    // Returns a random number between min and max
+    function getRandomArbitrary(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function getRandomBool(){
+        return Math.random() < .5;
+    }
+
+    </script>
+</body>
+</html>
