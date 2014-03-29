@@ -4,7 +4,7 @@ function jaguarMovement(){
         jaguarGoesToLeft = jaguarGoesToLeft ? false : true;
     };
 
-    if (!jaguarGoesToLeft) jaguar.scale.x = -0.75; //TODO: Fix backward collision (the cause is the negative scale, but why?)
+    if (!jaguarGoesToLeft) jaguar.scale.x = -0.75;
     else jaguar.scale.x = 0.75;
 
     jaguar.scale.y = 0.75;

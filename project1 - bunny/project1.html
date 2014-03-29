@@ -72,7 +72,8 @@
         playerScoreText.setText("Player score: " + playerScore)
         characterMovement();
         jaguarMovement();
-        calculateCollisions();
+        calculateCollisions(bunny, carrot, hitCarrot);
+		calculateCollisions(bunny, jaguar, hitJaguar);
         renderer.render(stage);
     }
     
@@ -94,29 +95,27 @@
         if (keycode == 38) key_up = false; // JUMP
     }
 
-    function calculateCollisions(){
-        var xdist = carrot.position.x - bunny.position.x;
+    function calculateCollisions(obj1, obj2, hitCode){
+		var xdist = obj1.position.x - obj2.position.x;
 
-        if(xdist > -carrot.width/2 && xdist < carrot.width/2) {
-            var ydist = carrot.position.y - bunny.position.y;
+        if(xdist > -obj1.width/2 && xdist < obj1.width/2) {
+            var ydist = obj1.position.y - obj2.position.y;
         
-            if(ydist > -carrot.height/2 && ydist < carrot.height/2) {
-                carrot.position.x = getRandomArbitrary(0, SCREEN_WIDTH);
-                carrot.position.y = getRandomArbitrary(SCREEN_HEIGHT / 2 + 50, SCREEN_HEIGHT / 2 + 130);
-                playerScore += 50;
+            if(ydist > -obj1.height/2 && ydist < obj1.height/2) {
+				hitCode(obj1, obj2);
             }
         }
-
-        xdist = jaguar.position.x - bunny.position.x;
-
-        if (xdist > -jaguar.width/2 && xdist < jaguar.width/2) {
-            ydist = jaguar.position.y - bunny.position.y;
-        
-            if(ydist > -jaguar.height/2 && ydist < jaguar.height/2) {
-                playerScore = 0;
-            }
-        };
     }
+	
+	function hitCarrot(bunny, carrot){
+		carrot.position.x = getRandomArbitrary(0, SCREEN_WIDTH);
+		carrot.position.y = getRandomArbitrary(SCREEN_HEIGHT / 2 + 50, SCREEN_HEIGHT / 2 + 130);
+		playerScore += 50;
+	}
+	
+	function hitJaguar(bunny, jaguar){
+		playerScore = 0;
+	}
 
     function textureUpdater(){
         if(bunny.texture.baseTexture.hasLoaded) {
