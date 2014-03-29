@@ -7,6 +7,12 @@
             padding: 0;
             background-color: #000000;
         }
+		@font-face {
+			font-family: 'eightBitWonder';
+			src: url('8bitWonder.ttf'), url('8bitWonder.ttf') format('truetype');
+			font-weight: normal;
+			font-style: normal;
+		}
     </style>
     <script src="../pixi.js/bin/pixi.js"></script>
     <script src="characterMovement.js"></script>
@@ -49,7 +55,7 @@
     var bunny = new PIXI.Sprite(bunnyTexture);
     var jaguar = new PIXI.Sprite(jaguarTexture);
 
-    var playerScoreText = new PIXI.Text("Player score: " + playerScore, {font: "35px Desyrel"});
+    var playerScoreText = new PIXI.Text("Player score: " + playerScore, {font: "25px eightBitWonder"});
     playerScoreText.position.x = 5;
     playerScoreText.position.y = 5;
  
