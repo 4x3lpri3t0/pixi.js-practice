@@ -4,8 +4,11 @@ function jaguarMovement(){
         jaguarGoesToLeft = jaguarGoesToLeft ? false : true;
     };
 
-    if (!jaguarGoesToLeft) jaguar.scale.x = -0.75;
-    else jaguar.scale.x = 0.75;
+    if (!jaguarGoesToLeft) {
+    	jaguar.scale.x = -0.75;
+    } else { 
+    	jaguar.scale.x = 0.75;
+    }
 
     jaguar.scale.y = 0.75;
     

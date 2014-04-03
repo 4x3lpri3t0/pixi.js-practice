@@ -19,8 +19,11 @@ function characterMovement(){
         };
     }
 
-    if (key_left) velocityX -= LATERAL_VELOCITY;
-    else if (key_right) velocityX += LATERAL_VELOCITY;
+    if (key_left) {
+        velocityX -= LATERAL_VELOCITY;
+    } else if (key_right) {
+        velocityX += LATERAL_VELOCITY;
+    }
     if (key_up) {
         if (bunny.position.y + bunny.height/2 === SCREEN_HEIGHT) { // is on floor?
             isBunnyJumping = true;
@@ -30,7 +33,9 @@ function characterMovement(){
 
     bunny.position.x += velocityX;
     bunny.position.y += velocityY;
+    
     // CHECK FLOOR LANDING
-    if (bunny.position.y + bunny.height/2 + velocityY > SCREEN_HEIGHT)
+    if (bunny.position.y + bunny.height/2 + velocityY > SCREEN_HEIGHT) {
         bunny.position.y = SCREEN_HEIGHT - bunny.height/2;
+    }
 }
